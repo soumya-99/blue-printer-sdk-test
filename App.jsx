@@ -79,11 +79,28 @@ const App = () => {
     //   console.log('React Try-Catch Err', error);
     // }
 
+    // try {
+    //   MyPrinter.printText((err, res) => {
+    //     if (err) console.log('React Side Err', err);
+    //     else console.log('Printing...', res);
+    //   });
+    // } catch (error) {
+    //   console.log('React Try-Catch Err', error);
+    // }
+
+
+    // try {
+    //   MyPrinter.printQRCode("Blasakhjdfilusgafysafdeafadef", (err, res) => {
+    //     if (err) console.log('React Side Err', err);
+    //     else console.log('Printing QR...', res);
+    //   });
+    // } catch (error) {
+    //   console.log('React Try-Catch Err', error);
+    // }
+
+
     try {
-      MyPrinter.printText((err, res) => {
-        if (err) console.log('React Side Err', err);
-        else console.log('Printing...', res);
-      });
+      MyPrinter.centerAlignedPrintText("Blasakhjdfilusgafysafdeafadef\nBlasakhjdfilusgafysafdeafadef\nBlasakhjdfilusgafyseafadef\nBlasakhjdfilusgafysafdeafadef\nBlasakhjdfilusgafysafdeafadef\nBlasakhjdfilusgafysafdeafadef\n\n", 36);
     } catch (error) {
       console.log('React Try-Catch Err', error);
     }

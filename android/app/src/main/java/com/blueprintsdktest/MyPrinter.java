@@ -2,6 +2,7 @@ package com.blueprintsdktest;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.telecom.Call;
 import android.util.Log;
 import android.view.View;
@@ -60,16 +61,18 @@ public class MyPrinter extends ReactContextBaseJavaModule {
         }
     }
 
-    void initPrinter(Callback callback) {
-            try {
-                ServiceManager.getInstence().init(getReactApplicationContext());
-            } catch (Exception e) {
-                callback.invoke(e, null);
-            }
+    void initPrinter() {
+        try {
+            ServiceManager.getInstence().init(getReactApplicationContext());
+        } catch (Exception e) {
+            Log.e("MyPrinter", "Init Exception Thrown.");
+        }
     }
 
+    @ReactMethod
     public void centerAlignedPrintText(String msg, int size) {
         try {
+            initPrinter();
             ServiceManager.getInstence().getPrinter().setPrintTypesettingType(GlobalDef.PRINTERLAYOUT_TYPESETTING);
             ServiceManager.getInstence().getPrinter().cleanCache();
             ServiceManager.getInstence().getPrinter().setPrintGray(2000);
@@ -87,6 +90,7 @@ public class MyPrinter extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
     public void leftAlignedPrintText(String msg, int size) {
         try {
             ServiceManager.getInstence().getPrinter().setPrintTypesettingType(GlobalDef.PRINTERLAYOUT_TYPESETTING);
@@ -107,6 +111,7 @@ public class MyPrinter extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
     public void rightAlignedPrintText(String msg, int size) {
         try {
             ServiceManager.getInstence().getPrinter().setPrintTypesettingType(GlobalDef.PRINTERLAYOUT_TYPESETTING);
@@ -127,33 +132,54 @@ public class MyPrinter extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void printText(Callback callback) {
+    public void printQRCode(String printContent) {
         try {
-            initPrinter(callback);
-//        centerAlignedPrintText("TAX INVOICE", TextPrintLine.FONT_LARGE);    //20 Chars
-//        centerAlignedPrintText("APPETALS SOLUTIONS PVT LTD", TextPrintLine.FONT_NORMAL);//32 Chars
-            rightAlignedPrintText("--------------------------------", TextPrintLine.FONT_NORMAL);
-            centerAlignedPrintText("PRODUCT NAME               RATE ", TextPrintLine.FONT_NORMAL);
-            centerAlignedPrintText("QTY      UNIT               AMT ", TextPrintLine.FONT_NORMAL);
-            rightAlignedPrintText("--------------------------------", TextPrintLine.FONT_NORMAL);
-            centerAlignedPrintText("XXXXXXXXXXXXXX     XXXXXXXXX.XX ", TextPrintLine.FONT_NORMAL);
-            centerAlignedPrintText("XXXX.XX  XXX       XXXXXXXXX.XX ", TextPrintLine.FONT_NORMAL);
-            rightAlignedPrintText("--------------------------------", TextPrintLine.FONT_NORMAL);
-            centerAlignedPrintText("XXXXXXXXXXXXXX     XXXXXXXXX.XX ", TextPrintLine.FONT_NORMAL);
-            centerAlignedPrintText("XXXX.XX  XXX       XXXXXXXXX.XX ", TextPrintLine.FONT_NORMAL);
-            rightAlignedPrintText("--------------------------------", TextPrintLine.FONT_NORMAL);
-            centerAlignedPrintText("XXXXXXXXXXXXXX     XXXXXXXXX.XX ", TextPrintLine.FONT_NORMAL);
-            centerAlignedPrintText("XXXX.XX  XXX       XXXXXXXXX.XX ", TextPrintLine.FONT_NORMAL);
-            rightAlignedPrintText("--------------------------------", TextPrintLine.FONT_NORMAL);
-            centerAlignedPrintText("TOTAL            XXXXXXXXXXX.XX ", TextPrintLine.FONT_NORMAL);
-//        paperFeed(1, TextPrintLine.FONT_SMALL);
-        centerAlignedPrintText("THANKYOU", TextPrintLine.FONT_LARGE);//48 Chars
-            paperFeed(3);
+            initPrinter();
+            ServiceManager.getInstence().getPrinter().setPrintGray(3000);
+            ServiceManager.getInstence().getPrinter().cleanCache();
+            BitmapPrintLine bitmapPrintLine = new BitmapPrintLine();
+            bitmapPrintLine.setType(PrintLine.BITMAP);
+            bitmapPrintLine.setPosition(PrintLine.CENTER);
+            //create QR code(max height is 384px)
+            Bitmap bitmap = QRUtil.getRQBMP(printContent, 240);
+            bitmapPrintLine.setBitmap(bitmap);
+            ServiceManager.getInstence().getPrinter().addPrintLine(bitmapPrintLine);
+            ServiceManager.getInstence().getPrinter().beginPrint(printer_callback);
+            ServiceManager.getInstence().getPrinter().setPrintGray(2000);
         } catch (Exception e) {
-            callback.invoke(e, null);
+            e.printStackTrace();
         }
     }
 
+//    @ReactMethod
+//    public void printText(Callback callback) {
+//        try {
+//            initPrinter(callback);
+////        centerAlignedPrintText("TAX INVOICE", TextPrintLine.FONT_LARGE);    //20 Chars
+//            centerAlignedPrintText("SYNERGIC SOFTEK SOLUTIONS PVT. LTD.", TextPrintLine.FONT_LARGE);
+//            //32 Chars
+//            rightAlignedPrintText("--------------------------------", TextPrintLine.FONT_NORMAL);
+//            centerAlignedPrintText("PRODUCT NAME               RATE ", TextPrintLine.FONT_NORMAL);
+//            centerAlignedPrintText("QTY      UNIT               AMT ", TextPrintLine.FONT_NORMAL);
+//            rightAlignedPrintText("--------------------------------", TextPrintLine.FONT_NORMAL);
+//            centerAlignedPrintText("XXXXXXXXXXXXXX     XXXXXXXXX.XX ", TextPrintLine.FONT_NORMAL);
+//            centerAlignedPrintText("XXXX.XX  XXX       XXXXXXXXX.XX ", TextPrintLine.FONT_NORMAL);
+//            rightAlignedPrintText("--------------------------------", TextPrintLine.FONT_NORMAL);
+//            centerAlignedPrintText("XXXXXXXXXXXXXX     XXXXXXXXX.XX ", TextPrintLine.FONT_NORMAL);
+//            centerAlignedPrintText("XXXX.XX  XXX       XXXXXXXXX.XX ", TextPrintLine.FONT_NORMAL);
+//            rightAlignedPrintText("--------------------------------", TextPrintLine.FONT_NORMAL);
+//            centerAlignedPrintText("XXXXXXXXXXXXXX     XXXXXXXXX.XX ", TextPrintLine.FONT_NORMAL);
+//            centerAlignedPrintText("XXXX.XX  XXX       XXXXXXXXX.XX ", TextPrintLine.FONT_NORMAL);
+//            rightAlignedPrintText("--------------------------------", TextPrintLine.FONT_NORMAL);
+//            centerAlignedPrintText("TOTAL            XXXXXXXXXXX.XX ", TextPrintLine.FONT_NORMAL);
+////        paperFeed(1, TextPrintLine.FONT_SMALL);
+////            printQRCode("Some*25*78*gsayftsyadfas*Cykablayttt!!!");
+//            centerAlignedPrintText("THANKYOU", TextPrintLine.FONT_LARGE);//48 Chars
+//            paperFeed(3);
+//        } catch (Exception e) {
+//            callback.invoke(e, null);
+//        }
+//    }
 
 
     public void paperFeed(int lines) {
@@ -176,7 +202,6 @@ public class MyPrinter extends ReactContextBaseJavaModule {
     public class PrinterListener implements OnPrinterListener {
         @Override
         public void onStart() {
-            // Print start
             Log.d("PrinterListener", "start print");
             printingstatus = false;
         }
@@ -185,8 +210,6 @@ public class MyPrinter extends ReactContextBaseJavaModule {
         public void onFinish() {
             // End of the print
             Log.d("PrinterListener", "Print success");
-            // timeTools.stop();
-            // Log.d("PrinterListener", "time cost：" + timeTools.getProcessTime());
             printingstatus = true;
 
         }
@@ -204,8 +227,6 @@ public class MyPrinter extends ReactContextBaseJavaModule {
             }
             if (errorCode == PrinterBinder.PRINTER_ERROR_OTHER) {
                 Toast.makeText(mContext, "Insufficient Paper", Toast.LENGTH_LONG).show();
-                // Toast.makeText(mContext, "other error happen during printing",
-                // Toast.LENGTH_SHORT).show();
             }
         }
     }
